@@ -34,6 +34,7 @@ library
       base >=4.7 && <5
     , bytestring >=0.11.3.1
     , containers >=0.6.5.1
+    , unix >=2.7.2.2
   default-language: Haskell2010
 
 executable shzyhxjzg-exe
@@ -48,6 +49,7 @@ executable shzyhxjzg-exe
     , bytestring >=0.11.3.1
     , containers >=0.6.5.1
     , shzyhxjzg
+    , unix >=2.7.2.2
   default-language: Haskell2010
 
 test-suite shzyhxjzg-test
@@ -63,4 +65,5 @@ test-suite shzyhxjzg-test
     , bytestring >=0.11.3.1
     , containers >=0.6.5.1
     , shzyhxjzg
+    , unix >=2.7.2.2
   default-language: Haskell2010

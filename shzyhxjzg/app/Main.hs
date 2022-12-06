@@ -5,13 +5,37 @@ import qualified Data.Map as M
 import qualified Data.ByteString as B
 import Data.Bits
 import Data.Word
+import System.Posix.IO as SPB
+import System.IO(interact)
+import GHC.IO.Handle (Handle)
+import Data.ByteString.Internal(packChars)
 
+
+--读文件写 stdout
+--main :: IO ()
+--main = do
+--    input <- B.readFile "input.txt"
+--    out <- return (encode input)
+--    putStrLn out
+
+-- 读取一行
+-- main :: IO ()
+-- main = do
+--      input <- B.getLine
+--      out <- return (encode input)
+--      putStrLn out
 
 main :: IO ()
 main = do
-    input <- B.readFile "input.txt"
-    out <- return (encode input)
-    putStrLn out
+    interact (encode . packChars)
+
+-- io :: IO(Handle, Handle)
+-- io = do
+--     (i,o) <- SPB.createPipe
+--     ih <- SPB.fdToHandle i
+--     oh <- SPB.fdToHandle o
+--     return (ih,oh)
+
 
 shzyhxjzg :: M.Map String Int
 shzyhxjzg = M.fromList [("富强", 0),("民主", 1),("文明", 2),("和谐", 3),("自由", 4),("平等", 5),("公正", 6),("法治", 7),("爱国", 8),("敬业", 9),("诚信", 10),("友善", 11)]
