@@ -8,7 +8,7 @@ import Data.Word
 import System.Posix.IO as SPB
 import System.IO(interact)
 import GHC.IO.Handle (Handle)
-import Data.ByteString.Internal(packChars)
+import Data.ByteString.Internal(packChars,unpackChars)
 
 
 --读文件写 stdout
@@ -25,9 +25,14 @@ import Data.ByteString.Internal(packChars)
 --      out <- return (encode input)
 --      putStrLn out
 
+-- stdin -> stdout
+-- main :: IO ()
+-- main = do
+--     interact (encode . packChars)
+
 main :: IO ()
 main = do
-    interact (encode . packChars)
+    interact (unpackChars . B.pack . decode)
 
 -- io :: IO(Handle, Handle)
 -- io = do
@@ -56,18 +61,24 @@ encode = concat . map get . concat . map splitWord8 . B.unpack
 splitWord8 :: Word8 -> [Word8]
 splitWord8 w = [(w .&. 0xf0) `shiftR` 4, w .&. 0x0f]
 
--- decode :: String -> B.ByteString
--- decode = let
---
---     in
---         verify .readd
---     where
---         readd [] = []
---         readd [x] = error "input is short"
---         readd (x:y:xs) = [x,y]:(read xs)
---         verify k = case M.member k shzyhxjzg of
---             Just v -> v
---             Nothing -> error "not found shzyhxjzg"
---
--- mergeWord8 :: [Word8] -> Word8
--- mergeWord8 [hight,low] = hight `shiftL` 4 .|. low
+decode :: String -> [Word8]
+decode = map mergeWord8 . splitWord . map tocode . group . splitString
+    where
+        splitString [] = []
+        splitString [_] = []
+        splitString (x:y:xs) = [x,y]:(splitString xs)
+        group [] = []
+        group [_] = []
+        group (x:xs@(y:ys)) = case M.lookup x shzyhxjzg of
+           Just v -> if v >= 10 then (x++y):(group ys) else x:(group xs)
+           Nothing -> error "not found shzyhxjzg"
+        tocode k = case M.lookup k decodeCodeMap of
+           Just v -> v
+           Nothing -> error "not found codes"
+        splitWord [] = []
+        splitWord [_] = []
+        splitWord (x:y:xs) = (x,y):splitWord xs
+
+
+mergeWord8 :: (Word8,Word8) -> Word8
+mergeWord8 (hight,low) = hight `shiftL` 4 .|. low
