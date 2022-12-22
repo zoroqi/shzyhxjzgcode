@@ -68,3 +68,35 @@
 // golang 中的写法
 ... -m de / -m
 ```
+
+# 2022-12-22
+
+发现之前只是粘了代码没看懂, 现在看看什么意思
+
+```haskell
+Maybe String -> a
+(\f opts -> opts { optMode = Just f }) . fromMaybe "en"
+
+---
+
+fromMaybe :: a -> Maybe a -> a
+fromMaybe "en"
+-- 声明: Maybe String -> String
+---
+
+(\f opts -> opts{optMode = Just f})
+-- 声明: Maybe String -> (Options -> Options)
+
+---
+(\f opts -> opts { optMode = Just f }) . fromMaybe "en"
+-- 声明: Maybe String -> (Options -> Options)
+```
+
+用 readFile 和 writeFile 实现文件读写.
+感觉有点别扭.
+do, let, where 三者组合的作用域我有点混乱.
+where 中 do 语句返回也有点混乱,
+    最后让我定义 pipe 函数的时候不得不多追加一个参数.
+我是想让 pipe 直接返回一个 `(String -> String) -> IO ()`, 这样的函数
+    但不知道为什么我必须把 `(String -> String)` 写在实现中, 无法理解.
+之后看看为啥吧.

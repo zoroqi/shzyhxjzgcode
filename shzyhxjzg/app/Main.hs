@@ -6,7 +6,7 @@ import qualified Data.ByteString as B
 import Data.Bits
 import Data.Word
 import System.Posix.IO as SPB
-import System.IO(interact)
+import System.IO(interact,IOMode(..),openFile,readFile,writeFile)
 import GHC.IO.Handle (Handle)
 import Data.ByteString.Internal(packChars,unpackChars)
 import System.Environment(getArgs)
@@ -16,18 +16,14 @@ import System.IO (hFlush, putStrLn, stderr, stdout)
 
 data Options = Options
     { optMode     :: Maybe String
-    -- , optShowVersion :: Bool
-    -- , optOutput      :: Maybe FilePath
-    -- , optInput       :: Maybe FilePath
-    -- , optLibDirs     :: [FilePath]
+    , optOutput      :: Maybe FilePath
+    , optInput       :: Maybe FilePath
     } deriving Show
 
 defaultOptions    = Options
     { optMode     = Just "en"
-    -- , optShowVersion = False
-    -- , optOutput      = Nothing
-    -- , optInput       = Nothing
-    -- , optLibDirs     = []
+      ,optOutput  = Nothing
+      ,optInput  = Nothing
     }
 
 options :: [OptDescr (Options -> Options)]
@@ -36,21 +32,15 @@ options =
         (OptArg ((\f opts -> opts { optMode = Just f }) . fromMaybe "en")
                 "mode")
         "mode en(encode)/de(decode)"
- -- , Option ['V','?'] ["version"]
-     -- (NoArg (\ opts -> opts { optShowVersion = True }))
-     -- "show version number"
- -- , Option ['o']     ["output"]
-     -- (OptArg ((\ f opts -> opts { optOutput = Just f }) . fromMaybe "output")
-             -- "FILE")
-     -- "output FILE"
- -- , Option ['c']     []
-     -- (OptArg ((\ f opts -> opts { optInput = Just f }) . fromMaybe "input")
-             -- "FILE")
-     -- "input FILE"
- -- , Option ['L']     ["libdir"]
-     -- (ReqArg (\ d opts -> opts { optLibDirs = optLibDirs opts ++ [d] }) "DIR")
-     -- "library directory"
- ]
+  , Option ['o']     ["output"]
+        (OptArg ((\f opts -> opts { optOutput = f }))
+             "FILE")
+        "output FILE"
+  , Option ['i']     ["input"]
+        (OptArg ((\f opts -> opts { optInput = f }))
+             "FILE")
+        "input FILE"
+    ]
 
 parseArgs :: IO Options
 parseArgs = do
@@ -63,15 +53,27 @@ parseArgs = do
 main :: IO ()
 main = do
     arg <- parseArgs
+    let
+        input = optInput arg
+        output = optOutput arg
+        pipeline = pipe (input,output)
     case optMode arg of
-        Just "en" -> en
-        Just "de" -> de
-        Just "" -> en
+        Just "en" -> pipeline en
+        Just "de" -> pipeline de
+        Just "" -> pipeline en
         Just f -> error f
         Nothing -> error "no mode"
     where
-        en = interact (encode . packChars)
-        de = interact (unpackChars . B.pack . decode)
+        en = (encode . packChars)
+        de = (unpackChars . B.pack . decode)
+        pipe (input, output) f = case (input, output) of
+            (Nothing,_) -> interact f
+            (_,Nothing) -> interact f
+            (Just i, Just o) -> do
+                s <- readFile i
+                writeFile o (f s)
+
+
 
 shzyhxjzg :: M.Map String Int
 shzyhxjzg = M.fromList [("富强", 0),("民主", 1),("文明", 2),("和谐", 3),("自由", 4),("平等", 5),("公正", 6),("法治", 7),("爱国", 8),("敬业", 9),("诚信", 10),("友善", 11)]
