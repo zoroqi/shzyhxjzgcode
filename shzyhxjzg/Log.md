@@ -100,3 +100,19 @@ where 中 do 语句返回也有点混乱,
 我是想让 pipe 直接返回一个 `(String -> String) -> IO ()`, 这样的函数
     但不知道为什么我必须把 `(String -> String)` 写在实现中, 无法理解.
 之后看看为啥吧.
+
+# 2022-12-26
+
+反复测试后我知道了, 我知道为什么要在 pipe 依赖一个函数生命出来.
+
+```haskell
+(Just i, Just o) -> do
+    s <- readFile i
+    return (\f -> writeFile o (f s))
+```
+
+这个写法最后返回的结果是 `IO ((String -> String) -> IO ())` 这么一个类型.
+不写 return 会报错, do 语句必须返回一个 Monad , 不写 return 返回的是一个 (String -> String) -> IO() 无法检测通过的.
+
+但是这么定义, 所有 interact 也需要用 return 进行包裹, 这个有点麻烦.
+还是写 f 吧. 看了 interact 也是这么做的.

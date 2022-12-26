@@ -1,18 +1,13 @@
 module Main (main) where
 
-import Lib
 import qualified Data.Map as M
 import qualified Data.ByteString as B
 import Data.Bits
 import Data.Word
-import System.Posix.IO as SPB
-import System.IO(interact,IOMode(..),openFile,readFile,writeFile)
-import GHC.IO.Handle (Handle)
 import Data.ByteString.Internal(packChars,unpackChars)
 import System.Environment(getArgs)
 import System.Console.GetOpt
 import Data.Maybe(fromMaybe)
-import System.IO (hFlush, putStrLn, stderr, stdout)
 
 data Options = Options
     { optMode     :: Maybe String
@@ -20,6 +15,7 @@ data Options = Options
     , optInput       :: Maybe FilePath
     } deriving Show
 
+defaultOptions :: Options
 defaultOptions    = Options
     { optMode     = Just "en"
       ,optOutput  = Nothing
@@ -72,8 +68,6 @@ main = do
             (Just i, Just o) -> do
                 s <- readFile i
                 writeFile o (f s)
-
-
 
 shzyhxjzg :: M.Map String Int
 shzyhxjzg = M.fromList [("富强", 0),("民主", 1),("文明", 2),("和谐", 3),("自由", 4),("平等", 5),("公正", 6),("法治", 7),("爱国", 8),("敬业", 9),("诚信", 10),("友善", 11)]
