@@ -32,3 +32,18 @@
 
 节目过程, 一次性读取 2 个汉子. 如果是"诚信"或"友善", 则再读取两个汉子.
 更具字典翻译成半个 byte, 再次读取半个 byte, 将两个 halfbyte 拼接一个完整 byte, 输出就好了.
+
+## 使用
+
+* 编码
+```
+echo "abc" | shzyhxjzgcode
+echo "abc" | shzyhxjzgcode -m en
+shzyhxjzgcode -i input.txt -o ouput.txt
+```
+
+* 解码
+```
+echo "公正民主公正文明公正和谐富强诚信富强" | shzyhxjzgcode -m de
+shzyhxjzgcode -m de -i input.txt -o ouput.txt
+```
